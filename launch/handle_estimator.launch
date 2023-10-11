@@ -9,9 +9,9 @@
 
 		<!-- D405単体 -->
 		<!-- <param name="sub_point_topic_name" type="str" value="/camera/depth_registered/points"/> -->
-		<!-- <param name="base_frame_name" type="str" value="camera_link"/>
-		<param name="camera_frame_name" type="str" value="camera_depth_frame"/>
-		<param name="map_frame_name" type="str" value="camera_link"/> -->
+		<!-- <param name="base_frame_name" type="str" value="camera_link"/> -->
+		<!-- <param name="camera_frame_name" type="str" value="camera_depth_frame"/> -->
+		<!-- <param name="map_frame_name" type="str" value="camera_link"/> -->
 
 		<!-- SOBIT PRO -->
 		<param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
@@ -31,6 +31,6 @@
 	</group>
 
 	<arg name="rviz"                      default="true"/>
-	<arg name="rviz_cfg"                  default="$(find rc_opl_2023_cml_main)/config/bag_point.rviz"/>
+	<arg name="rviz_cfg"                  default="$(find rcfr2023_cml)/config/bag_point_show.rviz"/>
 	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_cfg)"/>
 </launch>
