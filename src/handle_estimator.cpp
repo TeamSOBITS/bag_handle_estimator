@@ -1,33 +1,18 @@
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/Pose.h>
-#include <bag_handle_estimator/execute_ctrl.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/Bool.h>
-#include <std_msgs/Header.h>
-#include <tf/transform_broadcaster.h>
-#include <tf/transform_listener.h>
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <pcl/ModelCoefficients.h>
+#include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/passthrough.h>
-#include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
-#include <pcl/segmentation/extract_clusters.h>
-#include <pcl/segmentation/sac_segmentation.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/transforms.h>
-#include <pcl/surface/concave_hull.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+#include "bag_handle_estimator/execute_ctrl.h"
 
 class BagHandleEstimator {
  private:
@@ -35,17 +20,15 @@ class BagHandleEstimator {
   ros::Subscriber    sub_cloud;
   ros::Subscriber    sub_ctrl;
   ros::Publisher     pub_plane;
-  ros::Publisher     pub_marker;
   ros::ServiceServer service_execute_ctrl_;
 
-  tf::TransformListener    listerner;
-  tf::TransformBroadcaster broadcaster;
+  tf2_ros::Buffer               tfBuffer_;
+  tf2_ros::TransformBroadcaster broadcaster;
 
   // paramater
   bool   execute_flag;
   bool   estimated_flag;
-  bool   Publish_Plane;
-  bool   Publish_Object;
+  bool   publish_plane;
   double depth_z_min;
   double depth_z_max;
   double depth_x_min;
@@ -64,7 +47,7 @@ class BagHandleEstimator {
     this->estimated_flag = true;
 
     // load rosparam
-    ros::param::get("pub_plane_cloud", this->Publish_Plane);
+    ros::param::get("pub_plane_cloud", this->publish_plane);
     ros::param::get("execute_default", this->execute_flag);
 
     ros::param::get("depth_range_min_x", this->depth_x_min);
@@ -83,12 +66,12 @@ class BagHandleEstimator {
     this->sub_cloud = nh.subscribe(this->sub_point_topic_name, 1, &BagHandleEstimator::cloud_cb, this);
     this->service_execute_ctrl_ = nh.advertiseService("execute_ctrl", &BagHandleEstimator::execute_ctrl_server, this);
     this->pub_plane  = nh.advertise<sensor_msgs::PointCloud2>("cloud_plane", 1);
-    this->pub_marker = nh.advertise<visualization_msgs::MarkerArray>("marker", 1);
 
     std::cout << "start bag_handle_estimator" << std::endl;
 
   }  // bag_handle_estimator
 
+  // execute control
   bool execute_ctrl_server(bag_handle_estimator::execute_ctrl::Request&  req,
                            bag_handle_estimator::execute_ctrl::Response& res) {
     this->execute_flag = req.request;
@@ -101,6 +84,7 @@ class BagHandleEstimator {
     return true;
   }
 
+  // callback function
   void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& msg) {
     if (this->execute_flag == false) {
       return;
@@ -113,21 +97,16 @@ class BagHandleEstimator {
       return;
     }
 
-    //ここで座標変換可能か確認
-    bool key = listerner.canTransform(base_frame_name, camera_frame_name, ros::Time(0));
+    bool key = tfBuffer_.canTransform(this->base_frame_name, this->camera_frame_name, ros::Time(0), ros::Duration(2.0));
     if (key == false) {
       ROS_ERROR("bag_handle_estimator : pcl canTransform failue");
       return;
     }
-
-    // base_flame基準のpointcloudに変換
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl_ros::transformPointCloud(base_frame_name, ros::Time(0), *cloud_input, camera_frame_name, *cloud, listerner);
-
+    
     // filtering X limit
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cut_x(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PassThrough<pcl::PointXYZ>     pass_x;
-    pass_x.setInputCloud(cloud);
+    pass_x.setInputCloud(cloud_input);
     pass_x.setFilterFieldName("x");
     pass_x.setFilterLimits(depth_x_min, depth_x_max);
     pass_x.filter(*cloud_cut_x);
@@ -146,7 +125,6 @@ class BagHandleEstimator {
       return;
     }
 
-
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::ExtractIndices<pcl::PointXYZ>  extract;
     extract.setInputCloud(cloud_cuted);
@@ -155,11 +133,13 @@ class BagHandleEstimator {
     if (cloud_plane->points.size() == 0) {
       return;
     }
-    if (this->Publish_Plane == true) {
-      this->pub_plane_cloud(cloud_plane);
-    }  // publish plane cloud
 
-    //最も位置が高いポイントを探索
+    // publish plane cloud
+    if (this->publish_plane == true) {
+      this->pub_plane_cloud(cloud_plane);
+    }  
+
+    // search the most highest point
     int    most_high_point_index = 0;  
     double most_high_point      = DBL_MAX;
     for (int i = 0; i < cloud_cuted->points.size(); i++) {
@@ -170,49 +150,62 @@ class BagHandleEstimator {
       }
     }
 
-    bool key2 = listerner.canTransform(this->map_frame_name, this->base_frame_name, ros::Time(0));
+    // check if transformations are available
+    bool key2 = tfBuffer_.canTransform(this->map_frame_name, this->base_frame_name, ros::Time(0));
     if (key2 == false) {
       ROS_ERROR("bag_handle_estimator : canTransform failue");
       return;
     }
 
+    geometry_msgs::TransformStamped transformstamped;
+    transformstamped = tfBuffer_.lookupTransform(this->base_frame_name, this->map_frame_name, ros::Time(0));
+
+
+    // prepare broadcast tf 
     geometry_msgs::PointStamped base_2_high_point;
     base_2_high_point.header.frame_id = this->base_frame_name;
     base_2_high_point.header.stamp    = ros::Time(0);
     base_2_high_point.point.x         = cloud_cuted->points[most_high_point_index].x ;
     base_2_high_point.point.y         = cloud_cuted->points[most_high_point_index].y ;
     base_2_high_point.point.z         = cloud_cuted->points[most_high_point_index].z - 0.04;
-    this->listerner.transformPoint(this->map_frame_name, base_2_high_point, this->map_2_high_point);
+    tf2::doTransform (base_2_high_point,this->map_2_high_point,transformstamped);
     this->estimated_flag = true;
     broadcast_handle_point();
   }  // cloud_cb
 
-  // 点群の出力
+  // publish point cloud
   void pub_plane_cloud(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud) {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane_color(new pcl::PointCloud<pcl::PointXYZRGB>);
     pcl::copyPointCloud(*cloud, *cloud_plane_color);
     for (int i = 0; i < cloud_plane_color->points.size(); i++) {
       cloud_plane_color->points[i].g = 255;
-    }  // for
+    }  
     sensor_msgs::PointCloud2 sensor_cloud_plane;
     pcl::toROSMsg(*cloud_plane_color, sensor_cloud_plane);
     sensor_cloud_plane.header.frame_id = base_frame_name;
     pub_plane.publish(sensor_cloud_plane);
   }  // pub_plane_cloud
 
-  // tfの出力
+  // broadcast tf
   void broadcast_handle_point() {
     if (this->estimated_flag == false) {
       return;
     }
 
-    broadcaster.sendTransform(tf::StampedTransform(
-        tf::Transform(  // tfのブロードキャスト
-            tf::Quaternion(0, 0, 0, 1),
-            tf::Vector3(map_2_high_point.point.x, map_2_high_point.point.y, map_2_high_point.point.z)),
-        ros::Time::now(),
-        this->map_frame_name,
-        "handle_point"));
+    geometry_msgs::TransformStamped transformStamped;
+
+    transformStamped.header.stamp = ros::Time::now();
+    transformStamped.header.frame_id = this->map_frame_name;
+    transformStamped.child_frame_id = "handle_point";
+    transformStamped.transform.translation.x = map_2_high_point.point.x;
+    transformStamped.transform.translation.y = map_2_high_point.point.y;
+    transformStamped.transform.translation.z = map_2_high_point.point.z;
+    transformStamped.transform.rotation.x = 0.0;
+    transformStamped.transform.rotation.y = 0.0;
+    transformStamped.transform.rotation.z = 0.0;
+    transformStamped.transform.rotation.w = 1.0;
+
+    broadcaster.sendTransform(transformStamped);
 
   }  // broadcast_handle_point
 };

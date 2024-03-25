@@ -30,7 +30,4 @@
 
 	</group>
 
-	<arg name="rviz"                      default="true"/>
-	<arg name="rviz_cfg"                  default="$(find rcfr2023_cml)/config/bag_point_show.rviz"/>
-	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_cfg)"/>
 </launch>
