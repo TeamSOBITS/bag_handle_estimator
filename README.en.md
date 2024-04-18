@@ -97,7 +97,7 @@ First, please set up the following environment before proceeding to the next ins
 
 
 
-1. Set the parameters inside [handle_estimator.launch](bag_handle_estimator/launch/handle_estimator.launch)．
+1. Set the parameters inside [handle_estimator.launch](launch/handle_estimator.launch)．
    ```xml
     <!-- Whether to run at startup -->
     <param name="execute_default" type="bool" value="true"/>
@@ -113,7 +113,7 @@ First, please set up the following environment before proceeding to the next ins
    ```
 
 
-2. Execute the launch file[handle_estimator.launch](bag_handle_estimator/launch/handle_estimator.launch)
+2. Execute the launch file[handle_estimator.launch](launch/handle_estimator.launch)
    ```sh
    $ roslaunch bag_handle_estimator handle_estimator.launch
    ```
