@@ -25,7 +25,7 @@
       </ul>
     </li>
     <li>
-    　<a href="#実行・操作方法">実行・操作方法</a>
+    　<a href="#実行操作方法">実行・操作方法</a>
     </li>
   </ol>
 </details>
@@ -49,7 +49,7 @@
 <!-- セットアップ -->
 ## セットアップ
 
-ここで，本レポジトリのセットアップ方法について説明します．
+ここで，本リポジトリのセットアップ方法について説明します．
 
 ### 環境条件
 
@@ -75,11 +75,11 @@
    # もしくは，"cd ~/catkin_ws/"へ移動．
    $ cd src/
    ```
-2. 本レポジトリをcloneします．
+2. 本リポジトリをcloneします．
    ```sh
    $ git clone https://github.com/TeamSOBITS/bag_handle_estimator
    ```
-3. レポジトリの中へ移動します．
+3. リポジトリの中へ移動します．
    ```sh
    $ cd bag_handle_estimator/
    ```
@@ -99,7 +99,7 @@
 
 
 
-1. [handle_estimator.launch](bag_handle_estimator/launch/handle_estimator.launch)のパラメータを設定します．
+1. [handle_estimator.launch](launch/handle_estimator.launch)のパラメータを設定します．
    ```xml
     <!-- 起動時に実行するかどうか -->
     <param name="execute_default" type="bool" value="true"/>
@@ -115,7 +115,7 @@
    ```
 
 
-2. [handle_estimator.launch](bag_handle_estimator/launch/handle_estimator.launch)というlaunchファイルを実行します．
+2. [handle_estimator.launch](launch/handle_estimator.launch)というlaunchファイルを実行します．
    ```sh
    $ roslaunch bag_handle_estimator handle_estimator.launch
    ```
