@@ -11,7 +11,7 @@
 	
 		<param name="sub_ctrl_topic_name" type="str" value="execute_ctrl"/>
 
-		<!-- D405 Only -->
+		<!-- D405 only -->
 		<!-- <param name="sub_point_topic_name" type="str" value="/camera/depth_registered/points"/> -->
 		<!-- <param name="base_frame_name" type="str" value="camera_link"/> -->
 
