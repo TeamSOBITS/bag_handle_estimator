@@ -13,7 +13,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include "bag_handle_estimator/execute_ctrl.h"
+#include "sobits_msgs/RunCtrl.h"
 
 class BagHandleEstimator {
  private:
@@ -67,7 +67,7 @@ class BagHandleEstimator {
 
     // Create a ROS subscriber and publisher
     this->sub_cloud = nh.subscribe(this->sub_point_topic_name, 1, &BagHandleEstimator::cloud_cb, this);
-    this->service_execute_ctrl_ = nh.advertiseService("execute_ctrl", &BagHandleEstimator::execute_ctrl_server, this);
+    this->service_execute_ctrl_ = nh.advertiseService("/bag_handle_estimator/run_ctr", &BagHandleEstimator::execute_ctrl_server, this);
     this->pub_plane  = nh.advertise<sensor_msgs::PointCloud2>("cloud_plane", 1);
 
     std::cout << "start bag_handle_estimator" << std::endl;
@@ -75,8 +75,8 @@ class BagHandleEstimator {
   }  // bag_handle_estimator
 
   // execute control
-  bool execute_ctrl_server(bag_handle_estimator::execute_ctrl::Request& req,
-                           bag_handle_estimator::execute_ctrl::Response& res) {
+  bool execute_ctrl_server(sobits_msgs::RunCtrl::Request& req,
+                           sobits_msgs::RunCtrl::Response& res) {
     this->execute_flag = req.request;
     if (this->execute_flag == true) {
       ROS_INFO("Start bag_handle_estimator.");

@@ -122,7 +122,7 @@ First, please set up the following environment before proceeding to the next ins
 
 ### Toggle detection execution
 ```bash
-/bag_handle_estimater/execute_ctrl [std_msgs/Bool]
+/bag_handle_estimator/run_ctr [std_msgs/Bool]
 #Send True to start detection,Send False to end detection(default:True)
 ```
 
@@ -131,10 +131,7 @@ First, please set up the following environment before proceeding to the next ins
  * /rosout [rosgraph_msgs/Log]
  * /tf2 [tf2_msgs/TFMessage]
 
-### Subscriptions:
- * /camera/depth_registered/points [sensor_msgs/PointCloud2]
- * /bag_handle_estimater/execute_ctrl  [std_msgs/Bool]
- * /tf2 [tf2_msgs/TFMessage]
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
