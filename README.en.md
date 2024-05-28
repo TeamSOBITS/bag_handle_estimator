@@ -41,7 +41,7 @@
 The center of the handle of a paper bag is output as a "handle_point".
 Once detected, the TF of the location is always output.
 
-The start and stop of detection can be controlled by a service of type bool in execute_ctrl.
+The start and stop of detection can be controlled by a service of type RunCtrl in sobits_msgs.
 
 
 <!-- GETTING STARTED -->
@@ -99,13 +99,26 @@ First, please set up the following environment before proceeding to the next ins
 
 1. Set the parameters inside [handle_estimator.launch](launch/handle_estimator.launch)．
    ```xml
+    <!-- Whether to start rviz  -->
+    <arg name="rviz"                    default="false"/>
     <!-- Whether to run at startup -->
     <param name="execute_default" type="bool" value="true"/>
     <!-- Whether to output a point cloud or not -->
-	<param name="pub_plane_cloud" type="bool" value="true"/>
-    ...
-   ```
-
+	 <param name="pub_plane_cloud" type="bool" value="true"/>
+    <!-- subscribe topic name -->
+    <param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
+    <!-- base_frame name -->
+    <param name="base_frame_name" type="str" value="base_footprint"/>
+    <!-- depth range -->
+    <param name="depth_range_min_x" type="double" value="0.0"/>
+    <param name="depth_range_max_x" type="double" value="1.2"/>
+    <!-- width range -->
+    <param name="depth_range_min_y" type="double" value="-0.35"/>
+    <param name="depth_range_max_y" type="double" value="0.35"/>
+    <!-- height range -->
+    <param name="depth_range_min_z" type="double" value="0.5"/>
+    <param name="depth_range_max_z" type="double" value="1.0"/>
+   
 
 2. Activate the RGB-D camera
    ```sh
@@ -122,7 +135,7 @@ First, please set up the following environment before proceeding to the next ins
 
 ### Toggle detection execution
 ```bash
-/bag_handle_estimator/run_ctr [std_msgs/Bool]
+/bag_handle_estimator/run_ctr [sobits_msgs/RunCtrl]
 #Send True to start detection,Send False to end detection(default:True)
 ```
 

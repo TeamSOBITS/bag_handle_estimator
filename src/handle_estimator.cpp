@@ -37,7 +37,6 @@ class BagHandleEstimator {
   double depth_z_max;
 
   std::string sub_point_topic_name;
-  std::string sub_ctrl_topic_name;
   std::string camera_frame_name;
   std::string base_frame_name;
 
@@ -61,7 +60,6 @@ class BagHandleEstimator {
     ros::param::get("depth_range_max_z", this->depth_z_max);
 
     ros::param::get("sub_point_topic_name", this->sub_point_topic_name);
-    ros::param::get("sub_ctrl_topic_name", this->sub_ctrl_topic_name);
 
     ros::param::get("base_frame_name", this->base_frame_name);
 

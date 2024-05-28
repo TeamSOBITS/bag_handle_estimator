@@ -43,7 +43,7 @@
 
 後述するexecute_ctrlのフラグに関わらず，ノードが生存する間はTFを出し続けます．
 
-検出の開始，停止はexecute_ctrlのbool型のServiceで制御できます．
+検出の開始，停止はsobits_msgsのRunCtrl型のServiceで制御できます．
 
 
 <!-- セットアップ -->
@@ -101,13 +101,26 @@
 
 1. [handle_estimator.launch](launch/handle_estimator.launch)のパラメータを設定します．
    ```xml
+   <!-- rvizを起動するかどうか  -->
+    <arg name="rviz"                    default="false"/>
     <!-- 起動時に実行するかどうか -->
     <param name="execute_default" type="bool" value="true"/>
     <!-- 点群を出力するかどうか -->
-	<param name="pub_plane_cloud" type="bool" value="true"/>
-    ...
+	 <param name="pub_plane_cloud" type="bool" value="true"/>
+    <!-- subscribeするtopic名 -->
+    <param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
+    <!-- base_frameの名前 -->
+    <param name="base_frame_name" type="str" value="base_footprint"/>
+    <!-- depthの範囲 -->
+    <param name="depth_range_min_x" type="double" value="0.0"/>
+    <param name="depth_range_max_x" type="double" value="1.2"/>
+    <!-- widthの範囲 -->
+    <param name="depth_range_min_y" type="double" value="-0.35"/>
+    <param name="depth_range_max_y" type="double" value="0.35"/>
+    <!-- heightの範囲 -->
+    <param name="depth_range_min_z" type="double" value="0.5"/>
+    <param name="depth_range_max_z" type="double" value="1.0"/>
    ```
-
 
 2. RGB-Dカメラを起動します
    ```sh
@@ -124,18 +137,13 @@
 
 ### 検出の実行を切り替えるService型
 ```bash
-/bag_handle_estimater/execute_ctrl [std_msgs/Bool]
+/bag_handle_estimator/run_ctr [sobits_msgs/RunCtrl]
 #Trueを送って検出開始 Falseを送って検出終了(defaultはTrue)
 ```
 
 ### Publications:
  * /bag_handle_estimater/cloud_plane [sensor_msgs/PointCloud2]
  * /rosout [rosgraph_msgs/Log]
- * /tf2 [tf2_msgs/TFMessage]
-
-### Subscriptions:
- * /camera/depth_registered/points [sensor_msgs/PointCloud2]
- * /bag_handle_estimater/execute_ctrl  [std_msgs/Bool]
  * /tf2 [tf2_msgs/TFMessage]
 
 
