@@ -61,8 +61,8 @@ class BagHandleEstimator {
     nd_->declare_parameter("depth_range_max_y", 0.20);
     nd_->declare_parameter("depth_range_min_z", 0.00);
     nd_->declare_parameter("depth_range_max_z", 0.50);
-    nd_->declare_parameter("sub_point_topic_name", 0.50);
-    nd_->declare_parameter("base_frame_name", 0.50);
+    nd_->declare_parameter("sub_point_topic_name", "");
+    nd_->declare_parameter("base_frame_name", "base_footprint");
 
     execute_flag = nd_->get_parameter("execute_default").as_bool();
     depth_x_min = nd_->get_parameter("depth_range_min_x").as_double();

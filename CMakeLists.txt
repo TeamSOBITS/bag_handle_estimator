@@ -89,8 +89,13 @@ handle_estimator
 
 #-- for Launch
 install(DIRECTORY launch/
-        DESTINATION share/${PROJECT_NAME}/launch)
+DESTINATION share/${PROJECT_NAME}/launch)
 #--- end Launch
+
+#-- for Config
+install(DIRECTORY config/rviz/
+DESTINATION share/${PROJECT_NAME}/config/rviz)
+#--- end Config
 
 # include_directories(
 #   include
