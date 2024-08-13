@@ -1,0 +1,30 @@
+<!-- <?xml version="1.0"?> -->
+<launch>
+	<group ns = "bag_handle_estimator">
+
+		<!-- rviz -->
+		<!-- <arg name="rviz"                    default="false"/> -->
+		<!-- <arg name="rviz_cfg"                default="$(find bag_handle_estimator)/config/rviz/bag_handle.rviz"/> -->
+		
+		<param name="execute_default" value="true"/>
+		<param name="pub_plane_cloud" value="true"/>
+
+		<param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
+		<param name="base_frame_name" type="str" value="base_footprint"/>
+
+		<!-- depth range -->
+		<param name="depth_range_min_x" value="0.0"/>
+		<param name="depth_range_max_x" value="1.2"/>
+		<!-- width range -->
+		<param name="depth_range_min_y" value="-0.35"/>
+		<param name="depth_range_max_y" value="0.35"/>
+		<!-- height range -->
+		<param name="depth_range_min_z" value="-0.6"/>
+		<param name="depth_range_max_z" value="0.6"/>
+		
+		<node pkg="bag_handle_estimator" exec="bag_handle_estimator" output="screen"/>
+		
+		<!-- <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(val rviz_cfg)"/> -->
+	</group>
+
+</launch>
