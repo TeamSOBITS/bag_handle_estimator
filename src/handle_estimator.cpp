@@ -14,7 +14,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
-#include "sobits_msgs/srv/run_ctrl.hpp"
+#include "sobits_interfaces/srv/run_ctrl.hpp"
 
 class BagHandleEstimator {
  private:
@@ -28,7 +28,7 @@ class BagHandleEstimator {
   rclcpp::Node::SharedPtr nd_;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_cloud;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_plane;
-  rclcpp::Service<sobits_msgs::srv::RunCtrl>::SharedPtr service_execute_ctrl_;
+  rclcpp::Service<sobits_interfaces::srv::RunCtrl>::SharedPtr service_execute_ctrl_;
   tf2_ros::Buffer               tfBuffer_;
   tf2_ros::TransformListener    tfListener_;
   tf2_ros::TransformBroadcaster broadcaster;
@@ -88,7 +88,7 @@ class BagHandleEstimator {
 
     // Create a ROS subscriber and publisher
     sub_cloud = nd_->create_subscription<sensor_msgs::msg::PointCloud2>(sub_point_topic_name, 1, std::bind(&BagHandleEstimator::cloud_cb, this, std::placeholders::_1));
-    service_execute_ctrl_ = nd_->create_service<sobits_msgs::srv::RunCtrl>("/bag_handle_estimator/run_ctr", std::bind(&BagHandleEstimator::execute_ctrl_server, this, std::placeholders::_1, std::placeholders::_2));
+    service_execute_ctrl_ = nd_->create_service<sobits_interfaces::srv::RunCtrl>("/bag_handle_estimator/run_ctr", std::bind(&BagHandleEstimator::execute_ctrl_server, this, std::placeholders::_1, std::placeholders::_2));
     pub_plane = nd_->create_publisher<sensor_msgs::msg::PointCloud2>("cloud_plane", 1);
     // this->sub_cloud = nh.subscribe(this->sub_point_topic_name, 1, &BagHandleEstimator::cloud_cb, this);
     // this->service_execute_ctrl_ = nh.advertiseService("/bag_handle_estimator/run_ctr", &BagHandleEstimator::execute_ctrl_server, this);
@@ -99,8 +99,8 @@ class BagHandleEstimator {
   }  // bag_handle_estimator
 
   // execute control
-  bool execute_ctrl_server(const std::shared_ptr<sobits_msgs::srv::RunCtrl::Request> req, 
-                                 std::shared_ptr<sobits_msgs::srv::RunCtrl::Response> res) {
+  bool execute_ctrl_server(const std::shared_ptr<sobits_interfaces::srv::RunCtrl::Request> req, 
+                                 std::shared_ptr<sobits_interfaces::srv::RunCtrl::Response> res) {
     execute_flag = req->request;
     if (execute_flag) {
       RCLCPP_INFO(nd_->get_logger(), "Start bag_handle_estimator.");
