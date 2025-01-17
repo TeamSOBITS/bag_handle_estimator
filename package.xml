@@ -22,7 +22,7 @@
   <build_depend>pcl_ros</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>tf2_ros</build_depend>
-  <build_depend>sobits_interfaces</build_depend>
+  <build_depend>std_srvs</build_depend>
 
   <!-- Execution dependencies -->
   <exec_depend>rosidl_default_runtime</exec_depend>
@@ -35,7 +35,7 @@
   <exec_depend>pcl_ros</exec_depend>
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
-  <exec_depend>sobits_interfaces</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
   <!-- <depend>roscpp</depend> -->
   <!-- <depend>rospy</depend> -->
   <!-- <depend>sensor_msgs</depend> -->
@@ -46,7 +46,7 @@
   <!-- <depend>tf2</depend> -->
   <!-- <depend>tf2_ros</depend> -->
   <!-- <depend>tf2_geometry_msgs</depend> -->
-  <!-- <depend>sobits_interfaces</depend> -->
+  <!-- <depend>std_srvs</depend> -->
 
   <!-- Member of group -->
   <member_of_group>rosidl_interface_packages</member_of_group>

@@ -19,7 +19,7 @@ find_package(std_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(pcl_ros REQUIRED)
-find_package(sobits_interfaces REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 # ## Find catkin macros and libraries
@@ -36,7 +36,7 @@ find_package(rosidl_default_generators REQUIRED)
 #     tf2
 #     tf2_ros
 #     tf2_geometry_msgs
-#     sobits_interfaces
+#     std_srvs
 # )
 
 # generate_messages(
@@ -67,7 +67,7 @@ find_package(rosidl_default_generators REQUIRED)
 #   tf2
 #   tf2_ros
 #   tf2_geometry_msgs
-#   sobits_interfaces
+#   std_srvs
 # )
 
 ###########
@@ -79,7 +79,7 @@ find_package(rosidl_default_generators REQUIRED)
 #--- for C++
 include_directories(include)
 add_executable(handle_estimator src/handle_estimator.cpp)
-ament_target_dependencies(handle_estimator rclcpp std_msgs geometry_msgs sensor_msgs pcl_conversions pcl_ros tf2_ros sobits_interfaces rosidl_default_runtime)
+ament_target_dependencies(handle_estimator rclcpp std_msgs geometry_msgs sensor_msgs pcl_conversions pcl_ros tf2_ros std_srvs rosidl_default_runtime)
 
 install(TARGETS
 handle_estimator
