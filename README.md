@@ -88,7 +88,8 @@
 5. パッケージをコンパイルします．
    ```sh
    $ cd ~/colcon_ws/
-   $ colcon build
+   $ colcon build --symlink-install
+   $ source ~/colcon_ws/install/setup.sh
    ```
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
