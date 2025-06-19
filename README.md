@@ -57,9 +57,9 @@
 
 | System  | Version |
 | ------------- | ------------- |
-| Ubuntu | 20.04 (Focal Fossa) |
-| ROS | Noetic Ninjemys |
-| Python | 3.8 |
+| Ubuntu | 22.04 (Jammy Jellyfish) |
+| ROS | Humble Hawksbill |
+| Python | 3.0~ |
 
 > [!NOTE]
 > `Ubuntu`や`ROS`のインストール方法に関しては，[SOBITS Manual](https://github.com/TeamSOBITS/sobits_manual#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)を参照してください．
@@ -69,11 +69,9 @@
 
 ### インストール方法
 
-1. ROSの`src`フォルダに移動します．
+1. ROS2の`src`フォルダに移動します．
    ```sh
-   $ roscd
-   # もしくは，"cd ~/catkin_ws/"へ移動．
-   $ cd src/
+   $ cd ~/colcon_ws/src/
    ```
 2. 本リポジトリをcloneします．
    ```sh
@@ -83,11 +81,14 @@
    ```sh
    $ cd bag_handle_estimator/
    ```
-4. パッケージをコンパイルします．
+4. 依存パッケージをインストールします．
    ```sh
-   $ roscd
-   # もしくは，"cd ~/catkin_ws/"へ移動．
-   $ catkin_make
+   $ bash install.sh
+   ```
+5. パッケージをコンパイルします．
+   ```sh
+   $ cd ~/colcon_ws/
+   $ colcon build
    ```
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
@@ -99,38 +100,51 @@
 
 
 
-1. [handle_estimator.launch](launch/handle_estimator.launch)のパラメータを設定します．
-   ```xml
-   <!-- rvizを起動するかどうか  -->
-    <arg name="rviz"                    default="false"/>
-    <!-- 起動時に実行するかどうか -->
-    <param name="execute_default" type="bool" value="true"/>
-    <!-- 点群を出力するかどうか -->
-	 <param name="pub_plane_cloud" type="bool" value="true"/>
-    <!-- subscribeするtopic名 -->
-    <param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
-    <!-- base_frameの名前 -->
-    <param name="base_frame_name" type="str" value="base_footprint"/>
-    <!-- depthの範囲 -->
-    <param name="depth_range_min_x" type="double" value="0.0"/>
-    <param name="depth_range_max_x" type="double" value="1.2"/>
-    <!-- widthの範囲 -->
-    <param name="depth_range_min_y" type="double" value="-0.35"/>
-    <param name="depth_range_max_y" type="double" value="0.35"/>
-    <!-- heightの範囲 -->
-    <param name="depth_range_min_z" type="double" value="0.5"/>
-    <param name="depth_range_max_z" type="double" value="1.0"/>
+1. [handle_estimator.launch.py](launch/handle_estimator.launch.py)のパラメータを設定します．
+   ```python
+   rviz_arg = DeclareLaunchArgument(
+      'rviz',
+      # rvizを起動するかどうか
+      default_value='true',
+      description='Launch RViz'
+    )
+
+   handle_estimator_node = Node(
+      package='bag_handle_estimator',
+      executable='handle_estimator',
+      name='handle_estimator',
+      output='screen',
+      parameters=[{
+      # 起動時に実行するかどうか
+      'execute_default': True,
+      # 点群を出力するかどうか
+      'pub_plane_cloud': True,
+      # subscribeするtopic名
+      'sub_point_topic_name': '/camera/camera/depth/color/points',
+      # base_frameの名前
+      'base_frame_name': 'base_footprint',
+      # depthの範囲
+      'depth_range_min_x': 0.0,
+      'depth_range_max_x': 0.5,
+      # widthの範囲
+      'depth_range_min_y': -0.3,
+      'depth_range_max_y': 0.3,
+      # heightの範囲
+      'depth_range_min_z': 0.0,
+      'depth_range_max_z': 0.5
+         }]
+      )
    ```
 
 2. RGB-Dカメラを起動します
    ```sh
-   $ roslaunch realsense2_camera rs_rgbd.launch
+   $ ros2 launch realsense2_camera rs_rgbd.launch.py
    ```
 
 
-2. [handle_estimator.launch](launch/handle_estimator.launch)というlaunchファイルを実行します．
+2. [handle_estimator.launch.py](launch/handle_estimator.launch.py)というlaunchファイルを実行します．
    ```sh
-   $ roslaunch bag_handle_estimator handle_estimator.launch
+   $ ros2 launch bag_handle_estimator handle_estimator.launch.py
    ```
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
