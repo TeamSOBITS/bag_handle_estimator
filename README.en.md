@@ -8,14 +8,14 @@
 [![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
 
-# bag handle estimator
+# Bag Handle Estimator
 
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#Estimate the handle of a paper bag">Estimate the handle of a paper bag</a>
+      <a href="#Introduction">Introduction</a>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -32,9 +32,8 @@
 
 
 <!-- INTRODUCTION -->
-## Estimate the handle of a paper bag
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## Introduction
+This repository provides a package for estimating paper bag handles.
 
 ![Execute Result](img/estimate.png)
 
@@ -43,11 +42,15 @@ Once detected, the TF of the location is always output.
 
 The start and stop of detection can be controlled by a service of type RunCtrl in sobits_msgs.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
 This section describes how to set up this repository.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Prerequisites
 
@@ -55,37 +58,39 @@ First, please set up the following environment before proceeding to the next ins
 
 | System  | Version |
 | ------------- | ------------- |
-| Ubuntu | 20.04 (Focal Fossa) |
-| ROS | Noetic Ninjemys |
-| Python | 3.8 |
+| Ubuntu | 22.04 (Jammy Jellyfish) |
+| ROS | Humble Hawksbill |
+| Python | ~3.0 |
 
-> [!NOTE]
-> If you need to install `Ubuntu` or `ROS`, please check our [SOBITS Manual](https://github.com/TeamSOBITS/sobits_manual#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6).
+<!-- > [!NOTE]
+> If you need to install `Ubuntu` or `ROS`, please check our [SOBITS Manual](https://github.com/TeamSOBITS/sobits_manual#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6). -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ### Installation
 
-1. Go to the `src` folder of ROS.
+1. Go to the `src` folder of ROS2.
    ```sh
-   $ roscd
-   # Or just use "cd ~/catkin_ws/" and change directory.
-   $ cd src/
+   $ cd ~/colcon_ws/src/
    ```
 2. Clone this repository.
    ```sh
-   $ git clone https://github.com/TeamSOBITS/bag_handle_estimator
+   $ git clone -b humble-devel https://github.com/TeamSOBITS/bag_handle_estimator
    ```
 3. Navigate into the repository.
    ```sh
    $ cd bag_handle_estimator/
    ```
-4. Compile the package.
+4. Install the dependent packages.
    ```sh
-   $ roscd
-   # Or just use "cd ~/catkin_ws/" and change directory.
-   $ catkin_make
+   $ bash install.sh
+   ```
+5. Compile the package.
+   ```sh
+   $ cd ~/colcon_ws/
+   $ colcon build --symlink-install
+   $ source ~/colcon_ws/install/setup.sh
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -93,42 +98,51 @@ First, please set up the following environment before proceeding to the next ins
 
 <!-- LAUNCH AND USAGE EXAMPLES -->
 ## Launch and Usage
-※Please clone [realsense_ros](https://github.com/TeamSOBITS/realsense_ros) and run install.sh first.
+<!-- ※Please clone [realsense_ros](https://github.com/TeamSOBITS/realsense_ros) and run install.sh first. -->
 
 
 
-1. Set the parameters inside [handle_estimator.launch](launch/handle_estimator.launch)．
-   ```xml
-    <!-- Whether to start rviz  -->
-    <arg name="rviz"                    default="false"/>
-    <!-- Whether to run at startup -->
-    <param name="execute_default" type="bool" value="true"/>
-    <!-- Whether to output a point cloud or not -->
-	 <param name="pub_plane_cloud" type="bool" value="true"/>
-    <!-- subscribe topic name -->
-    <param name="sub_point_topic_name" type="str" value="/hand_camera/depth_registered/points"/>
-    <!-- base_frame name -->
-    <param name="base_frame_name" type="str" value="base_footprint"/>
-    <!-- depth range -->
-    <param name="depth_range_min_x" type="double" value="0.0"/>
-    <param name="depth_range_max_x" type="double" value="1.2"/>
-    <!-- width range -->
-    <param name="depth_range_min_y" type="double" value="-0.35"/>
-    <param name="depth_range_max_y" type="double" value="0.35"/>
-    <!-- height range -->
-    <param name="depth_range_min_z" type="double" value="0.5"/>
-    <param name="depth_range_max_z" type="double" value="1.0"/>
-   
+1. Set the parameters inside [handle_estimator.launch.py](launch/handle_estimator.launch.py)．
+   ```python
+   rviz_arg = DeclareLaunchArgument(
+      'rviz',
+      # rvizを起動するかどうか
+      default_value='true',
+      description='Launch RViz'
+    )
+
+   handle_estimator_node = Node(
+      package='bag_handle_estimator',
+      executable='handle_estimator',
+      name='handle_estimator',
+      output='screen',
+      parameters=[{
+      # 起動時に実行するかどうか
+      'execute_default': True,
+      # 点群を出力するかどうか
+      'pub_plane_cloud': True,
+      # subscribeするtopic名
+      'sub_point_topic_name': '/camera/camera/depth/color/points',
+      # base_frameの名前
+      'base_frame_name': 'base_footprint',
+      # depthの範囲
+      'depth_range_min_x': 0.0,
+      'depth_range_max_x': 0.5,
+      # widthの範囲
+      'depth_range_min_y': -0.3,
+      'depth_range_max_y': 0.3,
+      # heightの範囲
+      'depth_range_min_z': 0.0,
+      'depth_range_max_z': 0.5
+         }]
+      )
+   ``` 
 
 2. Activate the RGB-D camera
-   ```sh
-   $ roslaunch realsense2_camera rs_rgbd.launch
-   ```
 
-
-2. Execute the launch file[handle_estimator.launch](launch/handle_estimator.launch)
+3. Execute the launch file[handle_estimator.launch.py](launch/handle_estimator.launch.py)
    ```sh
-   $ roslaunch bag_handle_estimator handle_estimator.launch
+   $ ros2 launch bag_handle_estimator handle_estimator.launch.py
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -143,8 +157,6 @@ First, please set up the following environment before proceeding to the next ins
  * /bag_handle_estimater/cloud_plane [sensor_msgs/PointCloud2]
  * /rosout [rosgraph_msgs/Log]
  * /tf2 [tf2_msgs/TFMessage]
-
-
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
