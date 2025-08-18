@@ -106,7 +106,7 @@ First, please set up the following environment before proceeding to the next ins
    ```python
    rviz_arg = DeclareLaunchArgument(
       'rviz',
-      # rvizを起動するかどうか
+      # Whether to start rviz
       default_value='true',
       description='Launch RViz'
     )
@@ -117,21 +117,21 @@ First, please set up the following environment before proceeding to the next ins
       name='handle_estimator',
       output='screen',
       parameters=[{
-      # 起動時に実行するかどうか
+      # Whether to run at startup
       'execute_default': True,
-      # 点群を出力するかどうか
+      # Whether to output a point cloud or not
       'pub_plane_cloud': True,
-      # subscribeするtopic名
+      # subscribe topic name
       'sub_point_topic_name': '/camera/camera/depth/color/points',
-      # base_frameの名前
+      # base_frame name
       'base_frame_name': 'base_footprint',
-      # depthの範囲
+      # depth range
       'depth_range_min_x': 0.0,
       'depth_range_max_x': 0.5,
-      # widthの範囲
+      # width range
       'depth_range_min_y': -0.3,
       'depth_range_max_y': 0.3,
-      # heightの範囲
+      # height range
       'depth_range_min_z': 0.0,
       'depth_range_max_z': 0.5
          }]
